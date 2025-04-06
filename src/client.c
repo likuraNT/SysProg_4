@@ -7,11 +7,19 @@
 #include <stdio.h>
 #include <time.h>
 
-int main(int argc, char* argv[])
+
+
+void argv_ip(int port, int argc, char* argv[])
 {
 
+}
+void argv_switch();
+
+int main(int argc, char* argv[])
+{
     int client_sock = socket(AF_INET, SOCK_STREAM, 0);
     int port = 7777;
+    char chk_arg = '0';
     struct sockaddr_in sAddr;
 
     if (argc == 1)
@@ -20,7 +28,7 @@ int main(int argc, char* argv[])
         fprintf(stdout, "Using local address: 127.0.0.1\n");
     }
 
-    else
+    else if (argc == 2)
     {
         int ind = -1;
         int len = strlen(argv[1]);
@@ -49,6 +57,13 @@ int main(int argc, char* argv[])
         free(cur_ip);
     }
 
+    else if (argc == 3)
+    {
+        if (strcmp(argv[2], "manual") == 0) chk_arg = 'm';
+        else if (strcmp(argv[2], "auto") == 0) chk_arg = 'a';
+        else chk_arg = '0';  
+    } 
+
     sAddr.sin_family = AF_INET;
     sAddr.sin_port = htons(port);
 
@@ -59,7 +74,7 @@ int main(int argc, char* argv[])
     void* buffer = malloc(sizeof(int));
     while(true)
     {
-        if (*(int*)buffer != diff_num)
+        if ((chk_arg == 'm' || chk_arg == '0') && *(int*)buffer != diff_num)
         {
             printf("Enter your num:\n");
             scanf("%i", &diff_num);
@@ -70,6 +85,18 @@ int main(int argc, char* argv[])
                 printf("Server has closed the connection.\n");
                 break;
             }
+        }
+        else if (chk_arg == 'a' && *(int*)buffer != diff_num)
+        {
+            diff_num = rand()%101;
+            fprintf(stdout, "My num is: %i\n", diff_num);
+            send(client_sock, ptr_dn, sizeof(int), 0);
+
+            ssize_t bytes_received = recv(client_sock, buffer, sizeof(int), 0);
+                if (bytes_received == 0) {
+                    printf("Server has closed the connection.\n");
+                    break;
+                }
         }
         else
         {

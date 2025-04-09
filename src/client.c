@@ -8,13 +8,6 @@
 #include <time.h>
 
 
-
-void argv_ip(int port, int argc, char* argv[])
-{
-
-}
-void argv_switch();
-
 int main(int argc, char* argv[])
 {
     int client_sock = socket(AF_INET, SOCK_STREAM, 0);

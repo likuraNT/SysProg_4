@@ -52,6 +52,33 @@ int main(int argc, char* argv[])
 
     else if (argc == 3)
     {
+        int ind = -1;
+        int len = strlen(argv[1]);
+        for (int i = 0; i < len; ++i)
+        {
+            if (argv[1][i] == ':') {ind = i+1; break;}
+        }
+
+        char* cur_ip = malloc(ind);
+
+        for (int i = 0; i < ind - 1; ++i)
+        {
+            cur_ip[i] = argv[1][i];
+        }
+
+        char local_buff[len - ind + 1];
+
+        for (int i = 0; i < len-ind;++i )
+        {
+            local_buff[i] = argv[1][ind + i];
+        }
+        port = atoi (local_buff);
+
+        sAddr.sin_addr.s_addr = inet_addr(cur_ip);
+        fprintf(stdout, "Using different address: %s\n", argv[1]);
+        free(cur_ip);
+
+
         if (strcmp(argv[2], "manual") == 0) chk_arg = 'm';
         else if (strcmp(argv[2], "auto") == 0) chk_arg = 'a';
         else chk_arg = '0';  
@@ -62,6 +89,7 @@ int main(int argc, char* argv[])
 
     connect(client_sock, (struct sockaddr*)&sAddr, sizeof(sAddr));
 
+    int curr_num = -2;
     int diff_num = -1;
     int* ptr_dn = &diff_num;
     void* buffer = malloc(sizeof(int));
@@ -78,6 +106,14 @@ int main(int argc, char* argv[])
                 printf("Server has closed the connection.\n");
                 break;
             }
+
+            curr_num = *(int*)buffer;
+
+            if (curr_num > diff_num) {
+                fprintf(stdout, "My number is higher than you: %i\n", diff_num);
+            } else if (curr_num < diff_num) {
+                fprintf(stdout, "My number is lower than you: %i\n", diff_num);
+            }
         }
         else if (chk_arg == 'a' && *(int*)buffer != diff_num)
         {
@@ -90,10 +126,18 @@ int main(int argc, char* argv[])
                     printf("Server has closed the connection.\n");
                     break;
                 }
+
+            curr_num = *(int*)buffer;
+
+            if (curr_num > diff_num) {
+                fprintf(stdout, "My number is higher than you: %i\n", diff_num);
+            } else if (curr_num < diff_num) {
+                fprintf(stdout, "My number is lower than you: %i\n", diff_num);
+            }
         }
         else
         {
-            fprintf(stdout, "Current num is: %i\n", *(int*)buffer);
+            fprintf(stdout, "Correct num is: %i\n", *(int*)buffer);
             return 0;
         }
     }

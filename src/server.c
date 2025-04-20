@@ -63,14 +63,8 @@ int main(int argc, char* argv[]) {
 
             diff_num = *(int*)buff;
             log_req(c_ip, diff_num);
-
-            if (curr_num > diff_num) {
-                fprintf(stdout, "My number is higher than you: %i\n", diff_num);
-                *(int*)buff = -1;
-            } else if (curr_num < diff_num) {
-                fprintf(stdout, "My number is lower than you: %i\n", diff_num);
-                *(int*)buff = -1;
-            } else {
+            *(int*)buff = curr_num;
+            if (curr_num == diff_num) {
                 fprintf(stdout, "Correct!\n");
                 send(client_sock, (int*)buff, sizeof(int), 0);
                 break;
